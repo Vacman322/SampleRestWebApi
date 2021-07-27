@@ -48,6 +48,8 @@ namespace SampleRestWebApi
             var swaggerOptions = new SwaggerOptions();
             Configuration.GetSection(nameof(SwaggerOptions)).Bind(swaggerOptions);
 
+            app.UseAuthentication();
+
             app.UseSwagger(option =>
             {
                 option.RouteTemplate = swaggerOptions.JsonRoute;
