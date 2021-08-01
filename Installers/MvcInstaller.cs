@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SampleRestWebApi.Options;
+using SampleRestWebApi.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,8 @@ namespace SampleRestWebApi.Installers
             var jwtSetting = new JwtSettings();
             configuration.Bind("JwtSettings", jwtSetting);
             services.AddSingleton(jwtSetting);
+
+            services.AddScoped<IIdentityService, IdentityService>();
 
             services.AddMvc(options => options.EnableEndpointRouting = false)
                 .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_3_0);
@@ -43,34 +46,71 @@ namespace SampleRestWebApi.Installers
                     };
                 });
 
-            services.AddSwaggerGen(x =>
+            //services.AddSwaggerGen(x =>
+            //{
+            //    x.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "SampleRestApi", Version = "v1" });
+            //    var security = new OpenApiSecurityRequirement()
+            //    {
+            //        {
+            //            new OpenApiSecurityScheme()
+            //            {
+            //                Reference = new OpenApiReference
+            //                {
+            //                    Type = ReferenceType.SecurityScheme,
+            //                    Id = "Bearer"
+            //                }
+            //            },
+            //            new string[]{ }
+            //        }
+
+            //    };
+
+            //    x.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme()
+            //    {
+            //        Description = "JWT Authentication header using the bearer scheme",
+            //        Name = "Authentication",
+            //        Scheme = "Bearer",
+            //        BearerFormat = "JWT",
+            //        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+            //        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey
+            //    });
+
+            //    x.AddSecurityRequirement(security);
+            //});
+            services.AddSwaggerGen(swagger =>
             {
-                x.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "SampleRestApi", Version = "v1" });
-                var security = new OpenApiSecurityRequirement()
+                //This is to generate the Default UI of Swagger Documentation  
+                swagger.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "JWT Token Authentication API",
+                    Description = "ASP.NET Core 3.1 Web API"
+                });
+                // To Enable authorization using Swagger (JWT)  
+                swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\"",
+                });
+                swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     {
-                        new OpenApiSecurityScheme()
-                        {
-                            Reference = new OpenApiReference
+                          new OpenApiSecurityScheme
                             {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        new string[]{ }
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                }
+                            },
+                            new string[] {}
+
                     }
-
-                };
-
-                x.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme()
-                {
-                    Description = "JWT Authentication header using the bearer scheme",
-                    Name = "Authentication",
-                    In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey
                 });
-
-                x.AddSecurityRequirement(security);
             });
         }
     }

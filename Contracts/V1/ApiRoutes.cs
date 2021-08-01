@@ -18,5 +18,11 @@ namespace SampleRestWebApi.Contracts.V1
             public const string Get = Base + "/clients/{clientId}";
             public const string Create = Base + "/clients";
         }
+
+        public static class Identity
+        {
+            public const string Login = "/Identity/Login";
+            public const string Register = "/Identity/register";
+        }
     }
 }
