@@ -21,7 +21,7 @@ namespace SampleRestWebApi.Contracts.V1
 
         public static class Identity
         {
-            public const string Login = "/Identity/Login";
+            public const string Login = "/Identity/login";
             public const string Register = "/Identity/register";
         }
     }
