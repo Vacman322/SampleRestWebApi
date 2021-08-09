@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using SampleRestWebApi.Extensions;
 
 namespace SampleRestWebApi.Controllers.V1
 {
@@ -32,7 +33,7 @@ namespace SampleRestWebApi.Controllers.V1
         [HttpGet(ApiRoutes.Clients.Get)]
         public async Task<IActionResult> Get([FromRoute] int clientId)
         {
-            var client = await _clientService.GetClientByIdAsyn(clientId);
+            var client = await _clientService.GetClientByIdAsync(clientId);
 
             if (client is null)
                 return NotFound();
@@ -43,7 +44,10 @@ namespace SampleRestWebApi.Controllers.V1
         [HttpPost(ApiRoutes.Clients.Create)]
         public async Task<IActionResult> Create([FromBody]CreateClientRequest clientRequest)
         {
-            var client = new Client() { Name = clientRequest.Name };
+            var client = new Client() {
+                Name = clientRequest.Name,
+                UserId = HttpContext.GetUserId()
+            };
             await _clientService.CreateClientAsyn(client);
 
             var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
@@ -54,11 +58,15 @@ namespace SampleRestWebApi.Controllers.V1
         [HttpPut(ApiRoutes.Clients.Update)]
         public async Task<IActionResult> Update([FromRoute] int clientId,[FromBody] UpdateClientRequest request)
         {
-            var client = new Client() 
-            { 
-                Id = clientId,
-                Name = request.Name
-            };
+            var userOwnsPost = await _clientService.UserOwnClientAsync(clientId, HttpContext.GetUserId());
+
+            if (!userOwnsPost)
+            {
+                return BadRequest(new { Error = "You do not own this Client" });
+            }
+
+            var client = await _clientService.GetClientByIdAsync(clientId);
+            client.Name = request.Name;
 
             var updated = await _clientService.UpdateClientAsyn(client);
             if (updated)
@@ -70,6 +78,13 @@ namespace SampleRestWebApi.Controllers.V1
         [HttpDelete(ApiRoutes.Clients.Delete)]
         public async Task<IActionResult> Delete([FromRoute] int clientId)
         {
+            var userOwnsPost = await _clientService.UserOwnClientAsync(clientId, HttpContext.GetUserId());
+
+            if (!userOwnsPost)
+            {
+                return BadRequest(new { Error = "You do not own this Client" });
+            }
+
             var deleted = await _clientService.DeleteClientAsyn(clientId);
 
             if (deleted)

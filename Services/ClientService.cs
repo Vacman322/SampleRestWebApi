@@ -22,7 +22,7 @@ namespace SampleRestWebApi.Services
             return await _dataContext.Clients.ToListAsync();
         }
 
-        public async Task<Client> GetClientByIdAsyn(int id)
+        public async Task<Client> GetClientByIdAsync(int id)
         {
             return await _dataContext.Clients.SingleOrDefaultAsync(r => r.Id == id);
         }
@@ -43,7 +43,7 @@ namespace SampleRestWebApi.Services
 
         public async Task<bool> DeleteClientAsyn(int id)
         {
-            var client = await GetClientByIdAsyn(id);
+            var client = await GetClientByIdAsync(id);
 
             if (client == null)
                 return false;
@@ -51,6 +51,18 @@ namespace SampleRestWebApi.Services
             _dataContext.Clients.Remove(client);
             var deleted = await _dataContext.SaveChangesAsync();
             return deleted > 0;
+        }
+
+        public async Task<bool> UserOwnClientAsync(int clientId, string userId)
+        {
+            var client = await _dataContext.Clients.AsNoTracking().SingleOrDefaultAsync(x => x.UserId == userId);
+
+            if(client == null)
+            {
+                return false;
+            }
+
+            return client.UserId == userId;
         }
     }
 }

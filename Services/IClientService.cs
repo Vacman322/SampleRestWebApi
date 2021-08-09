@@ -10,7 +10,7 @@ namespace SampleRestWebApi.Services
     {
         Task<List<Client>> GetAllAsync();
 
-        Task<Client> GetClientByIdAsyn(int id);
+        Task<Client> GetClientByIdAsync(int id);
 
         Task<bool> UpdateClientAsyn(Client clientToUpdate);
 
@@ -18,5 +18,6 @@ namespace SampleRestWebApi.Services
 
 
         Task<bool> DeleteClientAsyn(int id);
+        Task<bool> UserOwnClientAsync(int clientId, string userId);
     }
 }
