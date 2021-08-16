@@ -15,6 +15,8 @@ namespace SampleRestWebApi.Data
         }
 
         public DbSet<Client> Clients { get; set; }
+
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
     }
 }
 
