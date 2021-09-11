@@ -4,6 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>aspnet-SampleRestWebApi-B83BF7D0-7B5C-4D01-8606-F4B600A6C7C7</UserSecretsId>
     <NoWin32Manifest>true</NoWin32Manifest>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
