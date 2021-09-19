@@ -11,23 +11,27 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using SampleRestWebApi.Extensions;
+using AutoMapper;
 
 namespace SampleRestWebApi.Controllers.V1
 {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ClientController : Controller
     {
-        private IClientService _clientService;
+        private readonly IClientService _clientService;
+        private readonly IMapper _mapper;
 
-        public ClientController(IClientService clientService)
+        public ClientController(IClientService clientService, IMapper mapper = null)
         {
             _clientService = clientService;
+            _mapper = mapper;
         }
 
         [HttpGet(ApiRoutes.Clients.GetAll)]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(await _clientService.GetAllAsync());
+            var clients = await _clientService.GetAllAsync();
+            return Ok(_mapper.Map<List<ClientResponse>>(clients));
         }
 
         [HttpGet(ApiRoutes.Clients.Get)]
@@ -38,7 +42,7 @@ namespace SampleRestWebApi.Controllers.V1
             if (client is null)
                 return NotFound();
 
-            return Ok(client);
+            return Ok(_mapper.Map<ClientResponse>(client));
         }
 
         [HttpPost(ApiRoutes.Clients.Create)]
@@ -46,13 +50,23 @@ namespace SampleRestWebApi.Controllers.V1
         {
             var client = new Client() {
                 Name = clientRequest.Name,
-                UserId = HttpContext.GetUserId()
+                LastName = clientRequest.LastName,
+                Patronymic = clientRequest.Patronymic,
+                BirthDay = clientRequest.BirthDay,
+                PhoneNumber = clientRequest.PhoneNumber,
+                Email = clientRequest.Email, 
+                UserId = HttpContext.GetUserId(),
+                ClientTags = clientRequest.Tags.Select(r => new ClientTag { Tag = new Tag { Name = r.Name} }).ToList()
             };
-            await _clientService.CreateClientAsyn(client);
+
+            if(!await _clientService.CreateClientAsync(client))
+            {
+                return BadRequest("Failed to create client");
+            }
 
             var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
             var locationUrl = baseUrl + "/" + ApiRoutes.Clients.Get.Replace("{clientId}", client.Id.ToString());
-            return Created(locationUrl, new ClientResponse() {Id = client.Id });
+            return Created(locationUrl, _mapper.Map<ClientResponse>(client));
         }
 
         [HttpPut(ApiRoutes.Clients.Update)]
@@ -67,10 +81,18 @@ namespace SampleRestWebApi.Controllers.V1
 
             var client = await _clientService.GetClientByIdAsync(clientId);
             client.Name = request.Name;
+            client.LastName = request.LastName;
+            client.Patronymic = request.Patronymic;
+            client.BirthDay = request.BirthDay;
+            client.PhoneNumber = request.PhoneNumber;
+            client.Email = request.Email;
+            client.ClientTags.RemoveAll(r => true);
+            client.ClientTags = request.Tags.Select(r => new ClientTag { Tag = new Tag { Name = r.Name } }).ToList();
+
 
             var updated = await _clientService.UpdateClientAsyn(client);
             if (updated)
-                return Ok(client);
+                return Ok(_mapper.Map<ClientResponse>(client));
 
             return NotFound();
         }
@@ -78,9 +100,9 @@ namespace SampleRestWebApi.Controllers.V1
         [HttpDelete(ApiRoutes.Clients.Delete)]
         public async Task<IActionResult> Delete([FromRoute] int clientId)
         {
-            var userOwnsPost = await _clientService.UserOwnClientAsync(clientId, HttpContext.GetUserId());
+            var userOwnsClient = await _clientService.UserOwnClientAsync(clientId, HttpContext.GetUserId());
 
-            if (!userOwnsPost)
+            if (!userOwnsClient)
             {
                 return BadRequest(new { Error = "You do not own this Client" });
             }

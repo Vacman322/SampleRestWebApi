@@ -27,7 +27,7 @@ namespace SampleRestWebApi.Services
             return await _dataContext.Clients.SingleOrDefaultAsync(r => r.Id == id);
         }
 
-        public async Task<bool> CreateClientAsyn(Client client)
+        public async Task<bool> CreateClientAsync(Client client)
         {
             await _dataContext.Clients.AddAsync(client);
             var created = await _dataContext.SaveChangesAsync();
@@ -55,7 +55,7 @@ namespace SampleRestWebApi.Services
 
         public async Task<bool> UserOwnClientAsync(int clientId, string userId)
         {
-            var client = await _dataContext.Clients.AsNoTracking().SingleOrDefaultAsync(x => x.UserId == userId);
+            var client = await _dataContext.Clients.AsNoTracking().SingleOrDefaultAsync(x => x.Id == clientId);
 
             if(client == null)
             {
@@ -63,6 +63,24 @@ namespace SampleRestWebApi.Services
             }
 
             return client.UserId == userId;
+        }
+
+        public Task<bool> AddTagsToClientAsync(Client client, List<Tag> tags)
+        {
+            var clientTags = new List<ClientTag>();
+
+            foreach (Tag tag in tags)
+            {
+                clientTags.Add(new ClientTag
+                {
+                    Client = client,
+                    Tag = tag
+                });
+            }
+
+            client.ClientTags = clientTags;
+
+            return UpdateClientAsyn(client);
         }
     }
 }

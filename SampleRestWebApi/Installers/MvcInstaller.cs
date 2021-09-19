@@ -49,38 +49,8 @@ namespace SampleRestWebApi.Installers
                     x.SaveToken = true;
                     x.TokenValidationParameters = tokenValidationParameters;
                 });
+            services.AddAuthorization();
 
-            //services.AddSwaggerGen(x =>
-            //{
-            //    x.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "SampleRestApi", Version = "v1" });
-            //    var security = new OpenApiSecurityRequirement()
-            //    {
-            //        {
-            //            new OpenApiSecurityScheme()
-            //            {
-            //                Reference = new OpenApiReference
-            //                {
-            //                    Type = ReferenceType.SecurityScheme,
-            //                    Id = "Bearer"
-            //                }
-            //            },
-            //            new string[]{ }
-            //        }
-
-            //    };
-
-            //    x.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme()
-            //    {
-            //        Description = "JWT Authentication header using the bearer scheme",
-            //        Name = "Authentication",
-            //        Scheme = "Bearer",
-            //        BearerFormat = "JWT",
-            //        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-            //        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey
-            //    });
-
-            //    x.AddSecurityRequirement(security);
-            //});
             services.AddSwaggerGen(swagger =>
             {
                 //This is to generate the Default UI of Swagger Documentation  

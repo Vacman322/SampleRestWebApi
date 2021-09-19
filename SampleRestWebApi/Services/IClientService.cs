@@ -14,8 +14,9 @@ namespace SampleRestWebApi.Services
 
         Task<bool> UpdateClientAsyn(Client clientToUpdate);
 
-        Task<bool> CreateClientAsyn(Client clientToUpdate);
+        Task<bool> CreateClientAsync(Client clientToAdd);
 
+        Task<bool> AddTagsToClientAsync(Client client,List<Tag> tags);
 
         Task<bool> DeleteClientAsyn(int id);
         Task<bool> UserOwnClientAsync(int clientId, string userId);

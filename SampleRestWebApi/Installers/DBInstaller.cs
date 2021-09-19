@@ -16,7 +16,8 @@ namespace SampleRestWebApi.Installers
         public void InstallServices(IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<DataContext>(options =>
-                options.UseSqlServer(
+                options.UseLazyLoadingProxies()
+                .UseSqlServer(
                     configuration.GetConnectionString("DefaultConnection")));
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
