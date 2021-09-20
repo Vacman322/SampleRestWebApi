@@ -9,6 +9,7 @@ namespace SampleRestWebApi.Services
     public interface IClientService
     {
         Task<List<Client>> GetAllAsync();
+        Task<List<Tag>> GetAllTagsAsync();
 
         Task<Client> GetClientByIdAsync(int id);
 
@@ -16,9 +17,9 @@ namespace SampleRestWebApi.Services
 
         Task<bool> CreateClientAsync(Client clientToAdd);
 
-        Task<bool> AddTagsToClientAsync(Client client,List<Tag> tags);
-
         Task<bool> DeleteClientAsyn(int id);
         Task<bool> UserOwnClientAsync(int clientId, string userId);
+
+
     }
 }

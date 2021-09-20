@@ -65,22 +65,9 @@ namespace SampleRestWebApi.Services
             return client.UserId == userId;
         }
 
-        public Task<bool> AddTagsToClientAsync(Client client, List<Tag> tags)
+        public async Task<List<Tag>> GetAllTagsAsync()
         {
-            var clientTags = new List<ClientTag>();
-
-            foreach (Tag tag in tags)
-            {
-                clientTags.Add(new ClientTag
-                {
-                    Client = client,
-                    Tag = tag
-                });
-            }
-
-            client.ClientTags = clientTags;
-
-            return UpdateClientAsyn(client);
+            return await _dataContext.Tags.ToListAsync();
         }
     }
 }
