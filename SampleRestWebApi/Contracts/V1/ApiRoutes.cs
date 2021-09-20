@@ -22,6 +22,10 @@ namespace SampleRestWebApi.Contracts.V1
         public static class Tags
         {
             public const string GetAll = Base + "/tags";
+            public const string Update = Base + "/tags/{tagName}";
+            public const string Delete = Base + "/tags/{tagName}";
+            public const string Get = Base + "/tags/{tagName}";
+            public const string Create = Base + "/tags";
         }
 
             public static class Identity

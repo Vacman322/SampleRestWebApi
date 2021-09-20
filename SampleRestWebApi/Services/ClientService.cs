@@ -34,14 +34,14 @@ namespace SampleRestWebApi.Services
             return created > 0;
         }
 
-        public async Task<bool> UpdateClientAsyn(Client clientToUpdate)
+        public async Task<bool> UpdateClientAsync(Client clientToUpdate)
         {
             _dataContext.Clients.Update(clientToUpdate);
             var updated = await _dataContext.SaveChangesAsync();
             return updated > 0;
         }
 
-        public async Task<bool> DeleteClientAsyn(int id)
+        public async Task<bool> DeleteClientAsync(int id)
         {
             var client = await GetClientByIdAsync(id);
 
@@ -68,6 +68,30 @@ namespace SampleRestWebApi.Services
         public async Task<List<Tag>> GetAllTagsAsync()
         {
             return await _dataContext.Tags.ToListAsync();
+        }
+
+        public async Task<Tag> GetTagByNameAsync(string name)
+        {
+            return await _dataContext.Tags.SingleOrDefaultAsync(r => r.Name == name);
+        }
+
+        public async Task<bool> CreateTagAsync(Tag tagToAdd)
+        {
+            await _dataContext.Tags.AddAsync(tagToAdd);
+            var created = await _dataContext.SaveChangesAsync();
+            return created > 0;
+        }
+
+        public async Task<bool> DeleteTagAsync(string tagName)
+        {
+            var tag = await GetTagByNameAsync(tagName);
+
+            if (tag == null)
+                return false;
+
+            _dataContext.Tags.Remove(tag);
+            var deleted = await _dataContext.SaveChangesAsync();
+            return deleted > 0;
         }
     }
 }

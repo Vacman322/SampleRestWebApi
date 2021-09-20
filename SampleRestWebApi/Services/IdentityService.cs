@@ -206,9 +206,15 @@ namespace SampleRestWebApi.Services
                     new Claim("id",user.Id),
                 };
 
-            var usersClaims = await _userManager.GetClaimsAsync(user);
+            //var usersClaims = await _userManager.GetClaimsAsync(user);
 
-            claims.AddRange(usersClaims);
+            //claims.AddRange(usersClaims);
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            foreach (var role in userRoles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

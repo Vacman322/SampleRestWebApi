@@ -90,7 +90,7 @@ namespace SampleRestWebApi.Controllers.V1
             client.ClientTags = request.Tags.Select(r => new ClientTag { Tag = new Tag { Name = r.Name } }).ToList();
 
 
-            var updated = await _clientService.UpdateClientAsyn(client);
+            var updated = await _clientService.UpdateClientAsync(client);
             if (updated)
                 return Ok(_mapper.Map<ClientResponse>(client));
 
@@ -107,7 +107,7 @@ namespace SampleRestWebApi.Controllers.V1
                 return BadRequest(new { Error = "You do not own this Client" });
             }
 
-            var deleted = await _clientService.DeleteClientAsyn(clientId);
+            var deleted = await _clientService.DeleteClientAsync(clientId);
 
             if (deleted)
                 return NoContent();
