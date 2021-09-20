@@ -48,6 +48,17 @@ namespace SampleRestWebApi.Controllers.V1
         [HttpPost(ApiRoutes.Clients.Create)]
         public async Task<IActionResult> Create([FromBody]CreateClientRequest clientRequest)
         {
+            var listClientTags = new List<ClientTag>();
+            foreach (var tag in clientRequest.Tags)
+            {
+                var tagInDb = await _clientService.GetTagByNameAsync(tag.Name);
+                if (tagInDb == null)
+                {
+                    return BadRequest(new { Error = $"Tag '{tag.Name}' does not exist in the database" });
+                }
+                listClientTags.Add(new ClientTag { Tag = tagInDb});
+            }
+
             var client = new Client() {
                 Name = clientRequest.Name,
                 LastName = clientRequest.LastName,
@@ -56,7 +67,7 @@ namespace SampleRestWebApi.Controllers.V1
                 PhoneNumber = clientRequest.PhoneNumber,
                 Email = clientRequest.Email, 
                 UserId = HttpContext.GetUserId(),
-                ClientTags = clientRequest.Tags.Select(r => new ClientTag { Tag = new Tag { Name = r.Name} }).ToList()
+                ClientTags = listClientTags
             };
 
             if(!await _clientService.CreateClientAsync(client))

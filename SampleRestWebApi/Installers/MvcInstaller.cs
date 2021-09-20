@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using SampleRestWebApi.Authorization;
 using SampleRestWebApi.Options;
 using SampleRestWebApi.Services;
 using System;
@@ -53,7 +55,12 @@ namespace SampleRestWebApi.Installers
             //{
             //    options.AddPolicy("TagViewer", builder => builder.RequireClaim("tags.view", "true"));
             //});
-            services.AddAuthorization();
+            services.AddAuthorization(option =>
+            {
+                option.AddPolicy("MustWorkForVacman", policy =>
+                 policy.AddRequirements(new WorkForCompanyRequirement("Vacman.ru")));
+            });
+            services.AddSingleton<IAuthorizationHandler, WorkForCompanyHandler>();
 
             services.AddSwaggerGen(swagger =>
             {

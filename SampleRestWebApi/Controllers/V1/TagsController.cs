@@ -14,7 +14,7 @@ using SampleRestWebApi.Domain;
 
 namespace SampleRestWebApi.Controllers.V1
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,Roles = "Admin,NormalUser")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TagsController : Controller
     {
         private readonly IClientService _clientService;
@@ -70,7 +70,8 @@ namespace SampleRestWebApi.Controllers.V1
         }
 
         [HttpDelete(ApiRoutes.Tags.Delete)]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
+        //[Authorize(Policy = "MustWorkForVacman")]
         public async Task<IActionResult> Delete([FromRoute] string tagName)
         {
 
