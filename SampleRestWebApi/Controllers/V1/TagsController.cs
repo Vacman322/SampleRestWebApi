@@ -36,9 +36,9 @@ namespace SampleRestWebApi.Controllers.V1
         }
 
         [HttpGet(ApiRoutes.Tags.Get)]
-        public async Task<IActionResult> Get([FromRoute] string tagName)
+        public async Task<IActionResult> Get([FromRoute] int tagId)
         {
-            var tag = await _clientService.GetTagByNameAsync(tagName);
+            var tag = await _clientService.GetTagByIdAsync(tagId);
 
             if (tag is null)
                 return NotFound();
@@ -56,26 +56,26 @@ namespace SampleRestWebApi.Controllers.V1
 
             if ((await _clientService.GetTagByNameAsync(tagRequest.Name)) != null)
             {
-                return BadRequest("Tag with the same name already exists");
+                return BadRequest(new { Error = "Tag with the same name already exists" });
             }
 
             if (!await _clientService.CreateTagAsync(tag))
             {
-                return BadRequest("Failed to create tag");
+                return BadRequest(new { Error = "Failed to create tag" });
             }        
 
             var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
-            var locationUrl = baseUrl + "/" + ApiRoutes.Tags.Get.Replace("{tagName}", tag.Name);
+            var locationUrl = baseUrl + "/" + ApiRoutes.Tags.Get.Replace("{tagId}", tag.Name);
             return Created(locationUrl, _mapper.Map<TagResponse>(tag));
         }
 
         [HttpDelete(ApiRoutes.Tags.Delete)]
         //[Authorize(Roles = "Admin")]
         //[Authorize(Policy = "MustWorkForVacman")]
-        public async Task<IActionResult> Delete([FromRoute] string tagName)
+        public async Task<IActionResult> Delete([FromRoute] int tagId)
         {
 
-            var deleted = await _clientService.DeleteTagAsync(tagName);
+            var deleted = await _clientService.DeleteTagAsync(tagId);
 
             if (deleted)
                 return NoContent();

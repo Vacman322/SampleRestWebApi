@@ -72,7 +72,7 @@ namespace SampleRestWebApi.Controllers.V1
 
             if(!await _clientService.CreateClientAsync(client))
             {
-                return BadRequest("Failed to create client");
+                return BadRequest(new { Error = "Failed to create client" });
             }
 
             var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
@@ -90,6 +90,17 @@ namespace SampleRestWebApi.Controllers.V1
                 return BadRequest(new { Error = "You do not own this Client" });
             }
 
+            var listClientTags = new List<ClientTag>();
+            foreach (var tag in request.Tags)
+            {
+                var tagInDb = await _clientService.GetTagByNameAsync(tag.Name);
+                if (tagInDb == null)
+                {
+                    return BadRequest(new { Error = $"Tag '{tag.Name}' does not exist in the database" });
+                }
+                listClientTags.Add(new ClientTag { Tag = tagInDb });
+            }
+
             var client = await _clientService.GetClientByIdAsync(clientId);
             client.Name = request.Name;
             client.LastName = request.LastName;
@@ -98,7 +109,7 @@ namespace SampleRestWebApi.Controllers.V1
             client.PhoneNumber = request.PhoneNumber;
             client.Email = request.Email;
             client.ClientTags.RemoveAll(r => true);
-            client.ClientTags = request.Tags.Select(r => new ClientTag { Tag = new Tag { Name = r.Name } }).ToList();
+            client.ClientTags = listClientTags;
 
 
             var updated = await _clientService.UpdateClientAsync(client);

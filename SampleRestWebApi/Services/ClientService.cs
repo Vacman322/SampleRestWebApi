@@ -70,9 +70,9 @@ namespace SampleRestWebApi.Services
             return await _dataContext.Tags.ToListAsync();
         }
 
-        public async Task<Tag> GetTagByNameAsync(string name)
+        public async Task<Tag> GetTagByIdAsync(int tagId)
         {
-            return await _dataContext.Tags.SingleOrDefaultAsync(r => r.Name == name);
+            return await _dataContext.Tags.SingleOrDefaultAsync(r => r.Id == tagId);
         }
 
         public async Task<bool> CreateTagAsync(Tag tagToAdd)
@@ -82,9 +82,9 @@ namespace SampleRestWebApi.Services
             return created > 0;
         }
 
-        public async Task<bool> DeleteTagAsync(string tagName)
+        public async Task<bool> DeleteTagAsync(int tagId)
         {
-            var tag = await GetTagByNameAsync(tagName);
+            var tag = await GetTagByIdAsync(tagId);
 
             if (tag == null)
                 return false;
@@ -92,6 +92,11 @@ namespace SampleRestWebApi.Services
             _dataContext.Tags.Remove(tag);
             var deleted = await _dataContext.SaveChangesAsync();
             return deleted > 0;
+        }
+
+        public async Task<Tag> GetTagByNameAsync(string tagName)
+        {
+            return await _dataContext.Tags.SingleOrDefaultAsync(r => r.Name == tagName);
         }
     }
 }
